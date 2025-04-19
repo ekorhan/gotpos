@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class CashRegister extends StatelessWidget {
+  const CashRegister({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -1053,7 +1043,7 @@ class _POSScreenState extends State<POSScreen>
               Expanded(
                 child: SizedBox(
                   height: 60, // Increased height
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     onPressed:
                         cart.isEmpty ? null : () => processPayment('Nakit'),
                     icon: const Icon(
@@ -1064,7 +1054,7 @@ class _POSScreenState extends State<POSScreen>
                       'Nakit',
                       style: TextStyle(fontSize: 18),
                     ), // Increased text size
-                    style: ElevatedButton.styleFrom(
+                    style: OutlinedButton.styleFrom(
                       backgroundColor: Colors.green.shade600,
                       foregroundColor: Colors.white,
                     ),
@@ -1075,7 +1065,7 @@ class _POSScreenState extends State<POSScreen>
               Expanded(
                 child: SizedBox(
                   height: 60, // Increased height
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     onPressed:
                         cart.isEmpty
                             ? null
@@ -1088,7 +1078,7 @@ class _POSScreenState extends State<POSScreen>
                       'Kredi Kartı',
                       style: TextStyle(fontSize: 18),
                     ), // Increased text size
-                    style: ElevatedButton.styleFrom(
+                    style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,
                     ),
