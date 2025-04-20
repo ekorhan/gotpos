@@ -19,16 +19,6 @@ class CartItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Kategori rengini almak için geçici çözüm (ProductCard'daki gibi)
-    final colors = {
-      'beverage': Colors.blue.shade700,
-      'food': Colors.orange.shade700,
-      'dessert': Colors.pink.shade400,
-      'fast_food': Colors.red.shade600,
-    };
-    // final categoryColor = colors[item.categoryId] ?? Colors.grey;
-    // Şimdilik sabit renk kullanalım, categoryId OrderItem'da yok
-    final itemColor = theme.colorScheme.primary;
 
     // Dismissible ile yana kaydırarak silme özelliği
     return Dismissible(

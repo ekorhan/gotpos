@@ -1,8 +1,6 @@
 // src/data/repositories/in_memory_settings_repository.dart
 import 'dart:async';
 import '../../domain/repositories/settings_repository.dart';
-import '../../domain/entities/table_info.dart'; // Gerekirse kullanılabilir
-import '../../domain/entities/product.dart'; // Gerekirse kullanılabilir
 
 class InMemorySettingsRepository implements SettingsRepository {
   // Verileri saklamak için listeler (Mock data)

@@ -12,7 +12,6 @@ class InMemoryDayProcessRepository implements DayProcessRepository {
       status: 'Açık',
     ),
   ];
-  double _cashInRegister = 0;
 
   @override
   Future<List<DayProcessInfo>> getDayProcesses() async {
@@ -38,7 +37,6 @@ class InMemoryDayProcessRepository implements DayProcessRepository {
   @override
   Future<void> addCashToRegister(double amount) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    _cashInRegister += amount;
     print(
       '[InMemoryDayProcessRepository] Kasaya \$${amount.toStringAsFixed(2)} eklendi. Toplam: \$_cashInRegister',
     );

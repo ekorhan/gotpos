@@ -1,7 +1,6 @@
 // src/presentation/pages/pos/pos_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Provider'ı import et
-import '../../../data/repositories/in_memory_pos_repository.dart'; // Geçici import
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/product.dart';
 import '../../../domain/entities/table_info.dart'; // Seçilen masa bilgisi için

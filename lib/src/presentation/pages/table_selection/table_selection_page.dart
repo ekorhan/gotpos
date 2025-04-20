@@ -1,7 +1,6 @@
 // src/presentation/pages/table_selection/table_selection_page.dart
 import 'package:flutter/material.dart';
 import 'package:gotpos/src/data/repositories/in_memory_pos_repository.dart';
-import '../../../data/repositories/in_memory_table_repository.dart'; // Geçici import
 import '../../../domain/entities/table_info.dart';
 import '../../../domain/repositories/table_repository.dart';
 import '../../widgets/app_drawer.dart';
@@ -56,7 +55,7 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
         builder:
             (context) => POSPage(
               selectedTable: selectedTable,
-              posRepository: InMemoryPosRepository()
+              posRepository: InMemoryPosRepository(),
             ), // POSPage'e masa bilgisini gönder
       ),
     );

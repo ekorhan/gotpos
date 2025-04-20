@@ -1,9 +1,6 @@
 // src/presentation/pages/pos/widgets/product_card.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../../domain/entities/product.dart';
-import '../../../../domain/entities/category.dart'; // Kategori rengi için
-import '../../../../domain/repositories/pos_repository.dart'; // Kategori bilgisi almak için
 
 class ProductCard extends StatelessWidget {
   final Product product;

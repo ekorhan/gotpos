@@ -1,8 +1,9 @@
-// src/data/repositories/in_memory_pos_repository.dart
 import 'package:flutter/material.dart'; // Renk ve ikonlar için
 import '../../domain/entities/category.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/pos_repository.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // JSON verisini işlemek için
 
 class InMemoryPosRepository implements PosRepository {
   late List<Category> _categories;
@@ -11,6 +12,11 @@ class InMemoryPosRepository implements PosRepository {
   InMemoryPosRepository() {
     _categories = _createMockCategories();
     _allProducts = _createMockProducts();
+  }
+
+  /// Asenkron olarak veri çeken init fonksiyonu
+  Future<void> init() async {
+    _categories = await _fetchCategories();
   }
 
   @override
@@ -31,6 +37,29 @@ class InMemoryPosRepository implements PosRepository {
     return List.unmodifiable(
       _allProducts.where((p) => p.categoryId == categoryId).toList(),
     );
+  }
+
+  Future<List<Category>> _fetchCategories() async {
+    final response = await http.get(
+      Uri.parse(
+        'https://6804312c79cb28fb3f5a8893.mockapi.io/gotpos/api/v1/categories',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      print("categories fetched successfully");
+      final List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((category) {
+        return Category(
+          id: category['id'],
+          name: category['categoryName'],
+          color: Colors.blue.shade700,
+          icon: Icons.category,
+        );
+      }).toList();
+    } else {
+      throw Exception('Failed to load categories');
+    }
   }
 
   // --- Mock Data Oluşturma Metotları ---

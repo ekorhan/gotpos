@@ -27,22 +27,4 @@ class InMemoryTableRepository implements TableRepository {
     // _updateRandomStatus(); // Demo için durumları rastgele güncelle
     return List.unmodifiable(_tables);
   }
-
-  // Demo amaçlı rastgele durum güncelleme (isteğe bağlı)
-  void _updateRandomStatus() {
-    final random = Random();
-    _tables =
-        _tables.map((masa) {
-          return TableInfo(
-            id: masa.id,
-            name: masa.name,
-            capacity: masa.capacity,
-            status:
-                random.nextInt(3) == 0
-                    ? TableStatus.empty
-                    : TableStatus.occupied,
-          );
-        }).toList();
-    print('[InMemoryTableRepository] Masa durumları rastgele güncellendi.');
-  }
 }
