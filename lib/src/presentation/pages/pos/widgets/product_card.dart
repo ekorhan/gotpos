@@ -19,7 +19,7 @@ class ProductCard extends StatelessWidget {
       'dessert': Colors.pink.shade400,
       'fast_food': Colors.red.shade600,
     };
-    return colors[product.categoryId] ?? Colors.grey; // Eşleşmezse gri
+    return colors[product.categoryId] ?? Colors.pink; // Eşleşmezse gri
   }
 
   @override

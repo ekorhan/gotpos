@@ -1,30 +1,56 @@
 // src/data/repositories/in_memory_table_repository.dart
-import 'dart:math';
 import '../../domain/entities/table_info.dart';
 import '../../domain/repositories/table_repository.dart';
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class InMemoryTableRepository implements TableRepository {
   late List<TableInfo> _tables;
 
   InMemoryTableRepository() {
-    _tables = List.generate(
-      32, // Başlangıçta 32 masa
-      (index) => TableInfo(
-        id: index + 1,
-        name: 'Masa ${index + 1}',
-        capacity: 4, // Varsayılan kapasite
-        // Demo için rastgele durum
-        status:
-            Random().nextInt(5) == 0 ? TableStatus.occupied : TableStatus.empty,
-      ),
-    );
+    fetchTables(); // Başlangıçta verileri çek
+  }
+
+  Future<void> fetchTables() async {
+    const url =
+        'http://34.40.120.88:8080/api/v1/tables/branch/f84f20dc-0d14-400b-a948-0777a2aed3fb';
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+        final List<dynamic> tableList = json['data']['tables'];
+
+        _tables =
+            tableList.map((tableJson) {
+              return TableInfo(
+                id: tableJson['id'],
+                name: tableJson['table_name'],
+                capacity: tableJson['capacity'],
+                status: _parseStatus(tableJson['status']),
+              );
+            }).toList();
+      } else {
+        print('Sunucu hatası: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('fetchTables hatası: $e');
+    }
+  }
+
+  TableStatus _parseStatus(String status) {
+    switch (status.toUpperCase()) {
+      case 'OCCUPIED':
+        return TableStatus.occupied;
+      case 'AVAILABLE':
+      default:
+        return TableStatus.empty;
+    }
   }
 
   @override
   Future<List<TableInfo>> getTables() async {
-    await Future.delayed(const Duration(milliseconds: 80)); // Simülasyon
-    // Yenileme demo mantığını buraya taşıyabiliriz veya UI'da bırakabiliriz
-    // _updateRandomStatus(); // Demo için durumları rastgele güncelle
     return List.unmodifiable(_tables);
   }
 }

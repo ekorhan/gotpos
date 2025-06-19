@@ -4,13 +4,8 @@ import 'package:flutter/material.dart'; // Color ve IconData için
 class Category {
   final String id;
   final String name;
-  final Color color;
-  final IconData icon;
+  final Color color = Colors.purple;
+  final IconData icon = Icons.category;
 
-  Category({
-    required this.id,
-    required this.name,
-    required this.color,
-    required this.icon,
-  });
+  Category({required this.id, required this.name});
 }

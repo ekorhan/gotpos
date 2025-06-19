@@ -1,6 +1,7 @@
 // src/presentation/pages/table_selection/table_selection_page.dart
 import 'package:flutter/material.dart';
 import 'package:gotpos/src/data/repositories/in_memory_pos_repository.dart';
+import 'package:gotpos/src/data/repositories/in_memory_payment_repository.dart';
 import '../../../domain/entities/table_info.dart';
 import '../../../domain/repositories/table_repository.dart';
 import '../../widgets/app_drawer.dart';
@@ -46,8 +47,9 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
     }
   }
 
-  void _navigateToPosScreen(TableInfo selectedTable) {
+  void _navigateToPosScreen(TableInfo selectedTable) async {
     print('Masa seçildi: ${selectedTable.name}');
+    final posRepository = await InMemoryPosRepository.create();
     // POSScreen'e seçilen masa bilgisiyle git
     Navigator.push(
       context,
@@ -55,7 +57,8 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
         builder:
             (context) => POSPage(
               selectedTable: selectedTable,
-              posRepository: InMemoryPosRepository(),
+              posRepository: posRepository,
+              paymentRepository: InMemoryPaymentRepository(),
             ), // POSPage'e masa bilgisini gönder
       ),
     );

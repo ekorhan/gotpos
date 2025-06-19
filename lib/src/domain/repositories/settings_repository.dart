@@ -1,4 +1,5 @@
 // src/domain/repositories/settings_repository.dart
+import '../../domain/entities/category.dart';
 
 abstract class SettingsRepository {
   // Masa işlemleri
@@ -14,4 +15,6 @@ abstract class SettingsRepository {
   // Stok işlemleri
   Future<void> addStock(String productId, int quantity);
   // Belki ileride: Future<int> getStock(String productId);
+
+  Future<List<Category>> getCategories();
 }

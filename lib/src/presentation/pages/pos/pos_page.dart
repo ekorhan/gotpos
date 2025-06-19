@@ -1,5 +1,7 @@
 // src/presentation/pages/pos/pos_page.dart
 import 'package:flutter/material.dart';
+import 'package:gotpos/src/domain/repositories/payment_repository.dart';
+// ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart'; // Provider'ı import et
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/product.dart';
@@ -15,8 +17,14 @@ import 'widgets/pos_sidebar.dart';
 class POSPage extends StatelessWidget {
   final TableInfo? selectedTable; // Hangi masadan gelindiği bilgisi (opsiyonel)
   final PosRepository posRepository;
+  final PaymentRepository paymentRepository;
 
-  const POSPage({super.key, this.selectedTable, required this.posRepository});
+  const POSPage({
+    super.key,
+    this.selectedTable,
+    required this.posRepository,
+    required this.paymentRepository,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +34,7 @@ class POSPage extends StatelessWidget {
       child: _POSPageContent(
         selectedTable: selectedTable,
         posRepository: posRepository,
+        paymentRepository: paymentRepository,
       ),
     );
   }
@@ -35,8 +44,13 @@ class POSPage extends StatelessWidget {
 class _POSPageContent extends StatefulWidget {
   final TableInfo? selectedTable;
   final PosRepository posRepository;
+  final PaymentRepository paymentRepository;
 
-  const _POSPageContent({this.selectedTable, required this.posRepository});
+  const _POSPageContent({
+    this.selectedTable,
+    required this.posRepository,
+    required this.paymentRepository,
+  });
 
   @override
   State<_POSPageContent> createState() => _POSPageContentState();
@@ -45,8 +59,6 @@ class _POSPageContent extends StatefulWidget {
 class _POSPageContentState extends State<_POSPageContent>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  late Future<List<Category>> _categoriesFuture;
-  late Future<List<Product>> _productsFuture; // Tüm ürünleri bir kere çekelim
   List<Category> _categories = []; // Future tamamlanınca doldurulacak
 
   // UI State
@@ -129,8 +141,6 @@ class _POSPageContentState extends State<_POSPageContent>
     });
     try {
       final categories = await widget.posRepository.getCategories();
-      final products =
-          await widget.posRepository.getProducts(); // Ürünleri de alalım
 
       if (mounted) {
         // Widget hala aktifse state'i güncelle
@@ -140,10 +150,7 @@ class _POSPageContentState extends State<_POSPageContent>
         // Ürünleri Future'dan çıkarıp bir değişkene atayabiliriz
         // veya ProductGrid içinde FutureBuilder kullanmaya devam edebiliriz.
         // Şimdilik Future olarak bırakalım, ProductGrid yönetecek.
-        _productsFuture = Future.value(products);
-        _categoriesFuture = Future.value(
-          categories,
-        ); // Future'ı da güncelleyelim
+        // Future'ı da güncelleyelim
 
         setState(() => _isLoading = false);
 
@@ -179,13 +186,34 @@ class _POSPageContentState extends State<_POSPageContent>
     });
 
     // Ödeme işlemi simülasyonu
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return; // Widget dispose edildiyse işlem yapma
 
       setState(() => _isProcessingPayment = false);
 
-      // Demo amaçlı rastgele başarılı/başarısız ödeme
-      final isSuccess = DateTime.now().millisecond % 5 != 0;
+      String orderId = await widget.paymentRepository.createOrder(
+        'f84f20dc-0d14-400b-a948-0777a2aed3fb',
+        123,
+      );
+      /*
+      widget.paymentRepository
+          .processPayment(
+            'POS_001_BRANCH_123',
+            orderId,
+            'CARD',
+            123.0, // Ödeme tutarı
+          )
+          .then((success) {
+            if (!success) {
+              setState(() {
+                _paymentErrorMessage =
+                    'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.';
+              });
+              return;
+            }
+          });
+          */
+      final isSuccess = orderId.isNotEmpty; // Simülasyon için basit kontrol
 
       if (isSuccess) {
         // Başarılı ödeme -> Dialog göster ve sepeti temizle

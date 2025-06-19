@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../domain/repositories/settings_repository.dart';
+import '../../../../domain/entities/category.dart';
+import '../../../../domain/entities/product.dart';
 
 class ProductDialogResult {
   final String name;
@@ -25,8 +27,65 @@ class _AddProductDialogState extends State<AddProductDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
-  // String? _selectedCategoryId; // Kategori seçimi için
+  String? _selectedCategoryId;
+  List<Category> _categories = [];
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      // Repository'den kategorileri al
+      final categories = await widget.repository.getCategories();
+      setState(() {
+        _categories = categories;
+      });
+    } catch (e) {
+      // Hata durumunda kullanıcıya bilgi verilebilir
+      print('Kategoriler yüklenirken hata: $e');
+    }
+  }
+
+  void _saveProduct() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final product = Product(
+        id: DateTime.now().millisecondsSinceEpoch.toString(), // Geçici ID
+        name: _nameController.text.trim(),
+        price: double.parse(_priceController.text.replaceAll(',', '.')),
+        categoryId: _selectedCategoryId!,
+        icon: Icons.shopping_bag, // Varsayılan ikon
+      );
+
+      // Ürünü kaydet (repository'de saveProduct metodu gerekli)
+      // await widget.repository.saveProduct(product);
+      widget.repository.addProduct(
+        product.name,
+        product.price,
+        product.categoryId,
+      );
+
+      Navigator.pop(context, product); // Ürünü geri döndür
+    } catch (e) {
+      // Hata mesajı göster
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ürün kaydedilirken hata: $e')));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -35,6 +94,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
     super.dispose();
   }
 
+  /*
   Future<void> _saveProduct() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -78,7 +138,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
       }
     }
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -99,9 +159,38 @@ class _AddProductDialogState extends State<AddProductDialog> {
                           : null,
             ),
             const SizedBox(height: 16),
-            // TODO: Kategori seçimi için DropdownButtonFormField eklenecek
-            // DropdownButtonFormField<String>(...)
-            // const SizedBox(height: 16),
+
+            // Kategori seçimi
+            DropdownButtonFormField<String>(
+              value: _selectedCategoryId,
+              decoration: const InputDecoration(
+                labelText: 'Kategori',
+                border: OutlineInputBorder(),
+              ),
+              hint: const Text('Kategori seçin'),
+              items:
+                  _categories.map((category) {
+                    return DropdownMenuItem<String>(
+                      value: category.id,
+                      child: Row(
+                        children: [
+                          Icon(category.icon, color: category.color, size: 20),
+                          const SizedBox(width: 8),
+                          Text(category.name),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedCategoryId = newValue;
+                });
+              },
+              validator:
+                  (value) => value == null ? 'Kategori seçmelisiniz' : null,
+            ),
+            const SizedBox(height: 16),
+
             TextFormField(
               controller: _priceController,
               decoration: const InputDecoration(labelText: 'Fiyat (₺)'),

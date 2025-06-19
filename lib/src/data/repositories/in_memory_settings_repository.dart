@@ -1,5 +1,10 @@
 // src/data/repositories/in_memory_settings_repository.dart
 import 'dart:async';
+
+import 'package:http/http.dart' as http;
+import 'package:gotpos/src/domain/entities/category.dart';
+
+import 'dart:convert';
 import '../../domain/repositories/settings_repository.dart';
 
 class InMemorySettingsRepository implements SettingsRepository {
@@ -27,18 +32,27 @@ class InMemorySettingsRepository implements SettingsRepository {
 
   @override
   Future<void> addProduct(String name, double price, String categoryId) async {
-    await Future.delayed(const Duration(milliseconds: 100)); // Simülasyon
-    _lastProductId++;
-    String newProductId = 'prod_${_lastProductId}'; // Basit ID üretimi
-    _products.add({
-      'id': newProductId,
-      'name': name,
-      'price': price,
-      'categoryId': categoryId,
-    });
-    print(
-      '[InMemorySettingsRepository] Ürün eklendi: ID: $newProductId, Ad: $name, Fiyat: $price, Kategori: $categoryId',
+    final response = await http.post(
+      Uri.parse('http://34.40.120.88:8082/api/v1/products'),
+      headers: {
+        'accept': 'application/json',
+        'X-API-Key': 'menu-service-staging-key-2024',
+      },
+      body: json.encode({
+        'product_name': name,
+        'base_price': price,
+        'category_id': categoryId,
+      }),
     );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final jsonBody = json.decode(response.body);
+      final String productId = jsonBody['data']['id'];
+
+      addProductToBranch(productId);
+    } else {
+      throw Exception('Failed to add product');
+    }
   }
 
   @override
@@ -50,5 +64,50 @@ class InMemorySettingsRepository implements SettingsRepository {
     );
   }
 
-  // Gerekirse diğer metodların implementasyonları...
+  @override
+  Future<List<Category>> getCategories() async {
+    final response = await http.get(
+      Uri.parse('http://34.40.120.88:8082/api/v1/categories'),
+      headers: {
+        'accept': 'application/json',
+        'X-API-Key': 'menu-service-staging-key-2024',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print("categories fetched successfully");
+
+      final jsonBody = json.decode(response.body);
+      final List<dynamic> categoryJson = jsonBody['data']['categories'];
+
+      return categoryJson.map((category) {
+        return Category(id: category['id'], name: category['category_name']);
+      }).toList();
+    } else {
+      throw Exception('Failed to load categories');
+    }
+  }
+
+  void addProductToBranch(String productId) async {
+    final response = await http.post(
+      Uri.parse(
+        'http://34.40.120.88:8082/api/v1/branches/f84f20dc-0d14-400b-a948-0777a2aed3fb/products',
+      ),
+      headers: {
+        'accept': 'application/json',
+        'X-API-Key': 'menu-service-staging-key-2024',
+      },
+      body: json.encode({
+        'discount': 10,
+        'first_price': 120,
+        'product_id': productId,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Ürün şubeye eklendi.');
+    } else {
+      throw Exception('Failed to add product');
+    }
+  }
 }

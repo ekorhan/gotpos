@@ -2,7 +2,7 @@
 enum TableStatus { empty, occupied } // Daha İngilizce ve standart isimler
 
 class TableInfo {
-  final int id;
+  final String id;
   final String name;
   final TableStatus status;
   final int
