@@ -1,4 +1,6 @@
 // src/domain/repositories/settings_repository.dart
+import 'package:gotpos/src/domain/entities/product.dart';
+
 import '../../domain/entities/category.dart';
 
 abstract class SettingsRepository {
@@ -17,4 +19,6 @@ abstract class SettingsRepository {
   // Belki ileride: Future<int> getStock(String productId);
 
   Future<List<Category>> getCategories();
+  Future<List<Product>> getAllProducts();
+  void addProductToBranch(String productId, double price);
 }

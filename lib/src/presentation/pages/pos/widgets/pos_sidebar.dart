@@ -1,9 +1,13 @@
 // src/presentation/pages/pos/widgets/pos_sidebar.dart
 import 'package:flutter/material.dart';
+import 'package:gotpos/src/data/repositories/in_memory_settings_repository.dart';
+import 'package:gotpos/src/domain/repositories/settings_repository.dart';
+import 'package:gotpos/src/presentation/pages/settings/settings_page.dart';
 import '../../../widgets/user_profile_footer.dart'; // Ortak footer'ı kullan
 
 class PosSidebar extends StatelessWidget {
-  const PosSidebar({super.key});
+  PosSidebar({super.key});
+  final SettingsRepository settingsRepository = InMemorySettingsRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -136,11 +140,13 @@ class PosSidebar extends StatelessWidget {
         if (isDrawer) {
           Navigator.pop(context);
         }
-        // Menü öğesi işlemi
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$label seçildi'),
-            duration: const Duration(seconds: 1),
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) =>
+                    SettingsPage(settingsRepository: settingsRepository),
           ),
         );
         // TODO: Gerçek aksiyonları buraya ekle (örn: Navigator.push, state güncelleme vb.)

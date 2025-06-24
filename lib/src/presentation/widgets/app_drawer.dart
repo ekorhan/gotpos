@@ -68,6 +68,7 @@ class AppDrawer extends StatelessWidget {
                     label: 'Gün İşlemleri',
                     targetPage: DayProcessPage(
                       dayProcessRepository: InMemoryDayProcessRepository(),
+                      settingsRepository: InMemorySettingsRepository(),
                     ),
                     // isActive: currentRoute == AppRoutes.dayProcess,
                   ),

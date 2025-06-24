@@ -1,5 +1,6 @@
 // src/presentation/pages/settings/settings_page.dart
 import 'package:flutter/material.dart';
+import 'package:gotpos/src/presentation/pages/settings/widgets/connect_product_dialog.dart';
 import '../../../domain/repositories/settings_repository.dart';
 // Dialog widget'larını import et
 import 'widgets/add_table_dialog.dart';
@@ -62,9 +63,15 @@ class SettingsPage extends StatelessWidget {
             ),
             _ActionCard(
               icon: Icons.add_box_outlined, // Outline ikonlar
-              label: 'Ürün Gir',
+              label: 'Ürün Oluştur',
               color: theme.colorScheme.secondary, // İkincil renk
               onTap: () => _showAddProductDialog(context),
+            ),
+            _ActionCard(
+              icon: Icons.join_full, // Outline ikonlar
+              label: 'Ürün Bağla',
+              color: theme.colorScheme.secondary, // İkincil renk
+              onTap: () => _showConnectProductDialog(context),
             ),
             _ActionCard(
               icon: Icons.inventory_2_outlined, // Outline ikonlar
@@ -117,6 +124,23 @@ class SettingsPage extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (_) => AddProductDialog(repository: settingsRepository),
+    );
+    if (result != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ürün "${result.name}" başarıyla eklendi.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showConnectProductDialog(BuildContext context) async {
+    // TODO: Ürün eklerken kategori seçimi de eklenmeli. Şimdilik varsayılan ID kullanıyoruz.
+    final result = await showDialog<ConnectProductDialogResult>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ConnectProductDialog(repository: settingsRepository),
     );
     if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(

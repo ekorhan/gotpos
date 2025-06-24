@@ -4,6 +4,7 @@ import '../../domain/entities/product.dart';
 import '../../domain/repositories/pos_repository.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '/src/core/utils/app_constants.dart';
 
 class InMemoryPosRepository implements PosRepository {
   late List<Category> _categories;
@@ -53,7 +54,7 @@ class InMemoryPosRepository implements PosRepository {
 
   Future<List<Category>> fetchCategories() async {
     final response = await http.get(
-      Uri.parse('http://34.40.120.88:8082/api/v1/categories'),
+      Uri.parse(AppConstants.categoryUrl),
       headers: {
         'accept': 'application/json',
         'X-API-Key': 'menu-service-staging-key-2024',
@@ -67,7 +68,11 @@ class InMemoryPosRepository implements PosRepository {
       final List<dynamic> categoryJson = jsonBody['data']['categories'];
 
       return categoryJson.map((category) {
-        return Category(id: category['id'], name: category['category_name']);
+        return Category(
+          id: category['id'],
+          name: category['category_name'],
+          icon: _mapCategoryToIcon(category['category_name']),
+        );
       }).toList();
     } else {
       throw Exception('Failed to load categories');
@@ -75,15 +80,12 @@ class InMemoryPosRepository implements PosRepository {
   }
 
   Future<List<Product>> fetchProducts() async {
-    const String url =
-        'http://34.40.120.88:8082/api/v1/branches/f84f20dc-0d14-400b-a948-0777a2aed3fb/products?limit=50&offset=0&sort_by=sort_order&sort_order=asc';
-
     try {
       final response = await http.get(
-        Uri.parse(url),
+        Uri.parse(AppConstants.fetchProductsUrl),
         headers: {
           'accept': 'application/json',
-          'X-API-Key': 'menu-service-staging-key-2024',
+          'X-API-Key': AppConstants.menuApiKey,
         },
       );
 
@@ -95,8 +97,6 @@ class InMemoryPosRepository implements PosRepository {
             productsJson.map((jsonItem) {
               final product = jsonItem['product'];
               final category = product['category'];
-
-              print('categoryName1: ${category['id']}');
 
               return Product(
                 id: jsonItem['id'] ?? '',

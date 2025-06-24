@@ -1,5 +1,6 @@
 // src/presentation/pages/pos/pos_page.dart
 import 'package:flutter/material.dart';
+import 'package:gotpos/src/core/utils/app_constants.dart';
 import 'package:gotpos/src/domain/repositories/payment_repository.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart'; // Provider'ı import et
@@ -112,7 +113,11 @@ class _POSPageContentState extends State<_POSPageContent>
           duration: const Duration(seconds: 2), // Süreyi biraz artıralım
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          margin: const EdgeInsets.all(8),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 100,
+            right: 20,
+            left: 20,
+          ),
           action: SnackBarAction(
             label: 'Sepeti Gör',
             onPressed: () {
@@ -168,7 +173,9 @@ class _POSPageContentState extends State<_POSPageContent>
   }
 
   // Ödeme işlemi (CartNotifier'dan veri alacak)
-  void _processPayment(String paymentMethod) {
+  void _processPayment(String paymentMethod) async {
+    //lock screen
+    if (_isProcessingPayment) return; // Zaten işlem yapılıyorsa çık
     final cartNotifier = context.read<CartNotifier>();
     if (cartNotifier.items.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,16 +193,20 @@ class _POSPageContentState extends State<_POSPageContent>
     });
 
     // Ödeme işlemi simülasyonu
-    Future.delayed(const Duration(seconds: 2), () async {
-      if (!mounted) return; // Widget dispose edildiyse işlem yapma
+    if (!mounted) return; // Widget dispose edildiyse işlem yapma
 
-      setState(() => _isProcessingPayment = false);
-
-      String orderId = await widget.paymentRepository.createOrder(
-        'f84f20dc-0d14-400b-a948-0777a2aed3fb',
-        123,
-      );
-      /*
+    String orderId = await widget.paymentRepository.createOrderBulk(
+      AppConstants.branchId,
+      cartNotifier.items.map((item) {
+        return Product(
+          id: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        );
+      }).toList(),
+    );
+    /*
       widget.paymentRepository
           .processPayment(
             'POS_001_BRANCH_123',
@@ -213,21 +224,21 @@ class _POSPageContentState extends State<_POSPageContent>
             }
           });
           */
-      final isSuccess = orderId.isNotEmpty; // Simülasyon için basit kontrol
+    final isSuccess = orderId.isNotEmpty; // Simülasyon için basit kontrol
 
-      if (isSuccess) {
-        // Başarılı ödeme -> Dialog göster ve sepeti temizle
-        final total = cartNotifier.totalAmount; // Toplam tutarı al
-        cartNotifier.clearCart(); // Sepeti temizle
-        _showPaymentSuccessDialog(paymentMethod, total);
-      } else {
-        // Başarısız ödeme -> Hata mesajı göster
-        setState(() {
-          _paymentErrorMessage =
-              'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.';
-        });
-      }
-    });
+    if (isSuccess) {
+      // Başarılı ödeme -> Dialog göster ve sepeti temizle
+      final total = cartNotifier.totalAmount; // Toplam tutarı al
+      cartNotifier.clearCart(); // Sepeti temizle
+      _showPaymentSuccessDialog(paymentMethod, total);
+    } else {
+      // Başarısız ödeme -> Hata mesajı göster
+      setState(() {
+        _paymentErrorMessage =
+            'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.';
+      });
+    }
+    setState(() => _isProcessingPayment = false);
   }
 
   // Başarılı ödeme dialog'u
@@ -315,7 +326,7 @@ class _POSPageContentState extends State<_POSPageContent>
             widget.selectedTable?.name, // Seçilen masa adını gönder
       ),
       // Mobil layout için Drawer
-      drawer: _isMobileLayout ? const PosSidebar() : null,
+      drawer: _isMobileLayout ? PosSidebar() : null,
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -381,7 +392,7 @@ class _POSPageContentState extends State<_POSPageContent>
     return Row(
       children: [
         // Sol Sidebar (Sabit)
-        const PosSidebar(),
+        PosSidebar(),
         // Ürünler Alanı (Genişler)
         Expanded(
           flex: 5, // Ürünler daha geniş alan kaplasın

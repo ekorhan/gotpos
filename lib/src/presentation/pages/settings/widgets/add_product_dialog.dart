@@ -68,13 +68,12 @@ class _AddProductDialogState extends State<AddProductDialog> {
 
       // Ürünü kaydet (repository'de saveProduct metodu gerekli)
       // await widget.repository.saveProduct(product);
-      widget.repository.addProduct(
+      await widget.repository.addProduct(
         product.name,
         product.price,
         product.categoryId,
       );
-
-      Navigator.pop(context, product); // Ürünü geri döndür
+      Navigator.pop(context); // Dialog'u kapat
     } catch (e) {
       // Hata mesajı göster
       ScaffoldMessenger.of(

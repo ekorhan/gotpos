@@ -38,12 +38,12 @@ class _TableSelectionPageState extends State<TableSelectionPage> {
   Color _getTableColor(TableStatus status, BuildContext context) {
     switch (status) {
       case TableStatus.empty:
-        return Colors.grey.shade600;
-      case TableStatus.occupied:
         // Temadan ana rengi almak daha esnek olabilir
         return Theme.of(
           context,
-        ).colorScheme.primary.withOpacity(0.8); // Indigo yerine
+        ).colorScheme.primary.withValues(alpha: 0.8); // Indigo yerine
+      case TableStatus.occupied:
+        return Colors.grey.shade600;
     }
   }
 

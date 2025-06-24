@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gotpos/src/domain/repositories/settings_repository.dart';
+import 'package:gotpos/src/presentation/pages/settings/settings_page.dart';
 import '../../../domain/entities/day_process_info.dart';
 import '../../../domain/repositories/day_process_repository.dart';
 import '../../widgets/action_button.dart'; // Yeni ActionButton widget'ı
@@ -7,11 +9,13 @@ import '../../widgets/app_drawer.dart'; // Ortak drawer
 class DayProcessPage extends StatefulWidget {
   // Repository'yi dışarıdan alacak şekilde güncelleyelim (DI için hazırlık)
   final DayProcessRepository dayProcessRepository;
+  final SettingsRepository settingsRepository;
 
   const DayProcessPage({
     super.key,
     // Geçici olarak burada instance oluşturuyoruz, idealde DI ile sağlanmalı
     required this.dayProcessRepository,
+    required this.settingsRepository,
   });
 
   @override
@@ -157,7 +161,15 @@ class _DayProcessPageState extends State<DayProcessPage> {
               // Ayarlar sayfasına gitmek için AppDrawer'daki yöntemi kullanabiliriz
               // Veya Navigator.push(...) ile doğrudan gidebiliriz
               // Şimdilik Drawer'daki Ayarlar'ı kullanmak daha merkezi.
-              Scaffold.of(context).openEndDrawer(); // Veya openDrawer()
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => SettingsPage(
+                        settingsRepository: widget.settingsRepository,
+                      ),
+                ),
+              );
             },
             tooltip: 'Ayarlar',
           ),

@@ -5,14 +5,16 @@ class Product {
   final String id; // Ürünü unique olarak tanımlamak için ID ekleyelim
   final String name;
   final double price;
-  final String categoryId;
+  String categoryId;
   final IconData icon;
+  int quantity = 1;
 
   Product({
     required this.id, // ID ekledik
     required this.name,
     required this.price,
-    required this.categoryId,
+    this.categoryId = '',
     this.icon = Icons.fastfood, // Varsayılan ikon
+    this.quantity = 1,
   });
 }

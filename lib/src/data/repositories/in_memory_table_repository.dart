@@ -1,4 +1,6 @@
 // src/data/repositories/in_memory_table_repository.dart
+import 'package:gotpos/src/core/utils/app_constants.dart';
+
 import '../../domain/entities/table_info.dart';
 import '../../domain/repositories/table_repository.dart';
 
@@ -13,10 +15,8 @@ class InMemoryTableRepository implements TableRepository {
   }
 
   Future<void> fetchTables() async {
-    const url =
-        'http://34.40.120.88:8080/api/v1/tables/branch/f84f20dc-0d14-400b-a948-0777a2aed3fb';
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(Uri.parse(AppConstants.fetchTablesUrl));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> json = jsonDecode(response.body);
